@@ -243,3 +243,133 @@ def plot_k_summary(results, n_vials=1, save_path=None):
     fig.suptitle(f'Sensitivity to k – {_scope(n_vials)}', x=0.01, ha='left', fontsize=18, fontweight='bold')
     _finish(fig, save_path)
 ##
+
+##############################################################################
+# Einzeldiagramme: jeweils NUR LyoPRONTO oder NUR korrigiert
+
+MODELS = {'ref': (LABEL_REF, C_REF, 'Oranges'), 'new': (LABEL_NEW, C_NEW, 'Blues')}
+
+def _budget_line(ax, budget, fac, unit):
+    # Sollwert aus der Energiebilanz als gestrichelte Linie mit Aufschlüsselung
+    Q = budget['Q_total']*fac
+    ax.axhline(Q, color=C_INK, lw=1.4, ls='--', zorder=2, label='Energy balance (target)')
+    ax.annotate(f'target {Q:.4g} {unit}', xy=(0.62, Q), xycoords=('axes fraction', 'data'),
+                xytext=(0, -8), textcoords='offset points', va='top', fontsize=12, color=C_INK)
+    text = (f'Energy balance {budget["T0"]:g} → {budget["Tend"]:g} °C\n'
+            f'liquid cooling   {budget["Q_liquid"]*fac:9.4g} {unit}\n'
+            f'latent heat      {budget["Q_latent"]*fac:9.4g} {unit}\n'
+            f'ice cooling      {budget["Q_ice"]*fac:9.4g} {unit}\n'
+            f'total            {Q:9.4g} {unit}')
+    ax.text(0.98, 0.04, text, transform=ax.transAxes, ha='right', va='bottom', fontsize=11,
+            family='monospace', color=C_INK,
+            bbox=dict(boxstyle='round,pad=0.5', facecolor='white', edgecolor=C_GRID))
+
+
+def plot_temperature_single(res, product, model, save_path=None):
+    apply_style()
+    label, color, _ = MODELS[model]
+    o = res['out_' + model]
+    t_end = res['ts'] if model == 'ref' else res['ts_star']
+    fig, ax = plt.subplots()
+
+    ax.plot(o[:, 0], o[:, 1], color=C_SHELF, lw=1.6, label='Shelf temperature')
+    ax.plot(o[:, 0], o[:, 2], color=color, label=f'Product – {label}')
+    _ref_lines(ax, product)
+    y = product['Tf'] + 4.0
+    ax.annotate('', xy=(t_end, y), xytext=(res['tn'], y), arrowprops=dict(arrowstyle='<->', color=color, lw=1.6))
+    ax.text(t_end + 0.03, y, f'Δt = {t_end - res["tn"]:.2f} h', va='center', fontsize=12, color=C_INK)
+
+    ax.set_xlabel('Time [h]')
+    ax.set_ylabel('Temperature [°C]')
+    ax.set_title(f'Freezing – {label}')
+    ax.set_xlim(left=0)
+    ax.legend(loc='upper right')
+    _finish(fig, save_path)
+
+
+def plot_power_single(res, model, n_vials=1, save_path=None):
+    apply_style()
+    label, color, _ = MODELS[model]
+    unit, fac, _, _ = _units(n_vials)
+    t, y = res['t_' + model], res['q_' + model]*fac
+    fig, ax = plt.subplots()
+
+    ax.plot(t, y, color=color, label=label)
+    k = int(np.argmax(y))
+    ax.plot(t[k], y[k], 'o', ms=8, color=color, mec='white', mew=2, zorder=5)
+    ax.annotate(f'max {y[k]:.3g} {unit}', xy=(t[k], y[k]), xytext=(8, 6),
+                textcoords='offset points', fontsize=12, color=C_INK)
+
+    ax.set_xlabel('Time [h]')
+    ax.set_ylabel(f'Heat removal rate [{unit}]')
+    ax.set_title(f'Cooling power – {label}, {_scope(n_vials)}')
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+    _finish(fig, save_path)
+
+
+def plot_energy_single(res, model, budget, n_vials=1, save_path=None):
+    apply_style()
+    label, color, _ = MODELS[model]
+    _, _, unit, fac = _units(n_vials)
+    t, y = res['t_' + model], res['E_' + model]*fac
+    fig, ax = plt.subplots()
+
+    ax.plot(t, y, color=color, label=label)
+    dev = (y[-1]/(budget['Q_total']*fac) - 1.0)*100
+    ax.annotate(f'{y[-1]:.4g} {unit}  ({dev:+.0f} %)', xy=(t[-1], y[-1]), xytext=(-6, 8), ha='right',
+                textcoords='offset points', fontsize=12, color=C_INK)
+    _budget_line(ax, budget, fac, unit)
+
+    ax.set_xlabel('Time [h]')
+    ax.set_ylabel(f'Cumulative heat removed [{unit}]')
+    ax.set_title(f'Energy demand – {label}, {_scope(n_vials)}')
+    ax.set_xlim(left=0)
+    ax.set_ylim(0, max(y.max(), budget['Q_total']*fac)*1.12)
+    ax.legend(loc='upper left')
+    _finish(fig, save_path)
+
+
+def plot_k_family_single(results, model, quantity, n_vials=1, product=None, budget=None, save_path=None):
+    # Kurvenschar der k-Variation für NUR ein Modell; quantity: 'T', 'q' oder 'E'
+    apply_style()
+    label, _, cmap = MODELS[model]
+    p_unit, p_fac, e_unit, e_fac = _units(n_vials)
+    fig, ax = plt.subplots()
+    n = len(results)
+
+    if quantity == 'T':
+        o = results[n//2]['out_' + model]
+        ax.plot(o[:, 0], o[:, 1], color=C_SHELF, lw=1.4, label='Shelf temperature')
+        _ref_lines(ax, product)
+    for r, c in zip(results, _ramp(cmap, n)):
+        if quantity == 'T':
+            t, y = r['out_' + model][:, 0], r['out_' + model][:, 2]
+        else:
+            t = r['t_' + model]
+            y = r[quantity + '_' + model]*(p_fac if quantity == 'q' else e_fac)
+        dk = round((r['factor'] - 1.0)*100)
+        base = dk == 0
+        ax.plot(t, y, color=c, lw=3.0 if base else 1.5, zorder=4 if base else 3,
+                label=(f'{dk:+d} %' if dk else '±0 %') + f'  (h = {r["h"]:.0f})')
+
+    name, ylabel, loc, anchor = {
+        'T': ('Product temperature', 'Temperature [°C]', 'lower right', (1.0, 0.10)),
+        'q': ('Cooling power', f'Heat removal rate [{p_unit}]', 'upper right', None),
+        'E': ('Energy demand', f'Cumulative heat removed [{e_unit}]', 'upper left', None),
+    }[quantity]
+    if quantity == 'E' and budget is not None:
+        _budget_line(ax, budget, e_fac, e_unit)
+        top = max(max(r['E_' + model][-1] for r in results), budget['Q_total'])*e_fac
+        ax.set_ylim(0, top*1.12)
+    elif quantity == 'q':
+        ax.set_ylim(bottom=0)
+
+    ax.set_xlabel('Time [h]')
+    ax.set_ylabel(ylabel)
+    scope = '' if quantity == 'T' else f', {_scope(n_vials)}'
+    ax.set_title(f'{name} – {label}, variation of k (±20 %){scope}')
+    ax.set_xlim(left=0)
+    ax.legend(loc=loc, bbox_to_anchor=anchor, fontsize=10, title='Δk  (h in W/m²K)', title_fontsize=10)
+    _finish(fig, save_path)
+##

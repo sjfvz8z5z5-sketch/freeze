@@ -66,3 +66,20 @@ def summary_table(results, n_vials=1):
 
     return pd.DataFrame(rows)
 ##
+
+##
+def energy_budget(vial, product, T0=None, Tend=-44.0):
+    # Sollwert der abzuführenden Wärme aus der Energiebilanz (Zustandsgröße, unabhängig von Zeit und k-Wert).
+    # Basis sind die LyoPRONTO-Konstanten; Masse = rho_solution * Vfill wie in crystallization_time_FUN.
+    cn = ref.constant
+    T0 = product['Tpr0'] if T0 is None else T0
+    m = cn.rho_solution*vial['Vfill']/cn.kg_To_g   # kg
+    Tf = product['Tf']
+
+    Q_liquid = m*cn.Cp_solution*(T0 - Tf)          # J, Flüssigkeit T0 -> Tf
+    Q_latent = m*cn.dHf*cn.cal_To_J*cn.kg_To_g     # J, Schmelzwärme
+    Q_ice = m*cn.Cp_ice*(Tf - Tend)                # J, Eis Tf -> Tend
+
+    return dict(Q_liquid=Q_liquid, Q_latent=Q_latent, Q_ice=Q_ice,
+                Q_total=Q_liquid + Q_latent + Q_ice, T0=T0, Tend=Tend)
+##
