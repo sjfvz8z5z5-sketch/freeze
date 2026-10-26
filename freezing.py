@@ -107,19 +107,27 @@ def freeze(vial, product, h_freezing, temp_setpt, temp_time_setpt, dt):
 
 
 
+    # Solid cooling: Tsh folgt weiter dem Profil (auch wenn ts noch in einer Rampe liegt),
+    # Tpr wird schrittweise mit der exakten Lösung für eine lineare Tsh-Rampe fortgeschrieben.
+    Tpr = product['Tf']
+    t_prev = ts
     while t < t_tr[-1]:
+        i = int(np.where(t_tr > t)[0][0])
+        Tsh_prev = Tsh
+        Tsh = Tsh + r[i] * constant.hr_To_min * dt
         Tpr = functions.lumped_cap_Tpr(
-            t - ts,
-            product['Tf'],
+            t - t_prev,
+            Tpr,
             constant.rho_ice,
             constant.Cp_ice,
             V_frozen,
             h_freezing,
             vial['Av'],
             Tsh,
-            Tsh,
-            0.0,
+            Tsh_prev,
+            r[i],
         )
+        t_prev = t
 
         out = np.append(out, [[t, Tsh, Tpr]], axis=0)
 
