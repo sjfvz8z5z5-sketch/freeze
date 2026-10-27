@@ -56,14 +56,7 @@
 </ul>
 <p>Zusätzlich wird der Wärmedurchgangskoeffizient (k-Wert) variiert, standardmäßig ±20&nbsp;% in 5-%-Schritten.</p>
 
-<h2>2&nbsp;&nbsp;Bedienung in drei Schritten</h2>
-<ol>
-  <li>Notebook im Repo-Ordner öffnen. Im selben Ordner müssen liegen: <code>LyoPronto_VIAL.xlsx</code>, <code>constants_freezing.py</code> und die übrigen <code>.py</code>-Dateien.</li>
-  <li>Im Abschnitt <b>Input</b> die Werte eintragen (Abschnitte 3 und 4).</li>
-  <li>Alle Zellen ausführen (<i>Run All</i>). Jeder Lauf legt einen neuen Ordner an, z.&nbsp;B. <code>LP_V0.2_Mannitol_5%_5ml(Schott)_2ml_261027_141530</code>, mit allen Diagrammen als PDF.</li>
-</ol>
-
-<h2>3&nbsp;&nbsp;Eingaben</h2>
+<h2>2&nbsp;&nbsp;Eingaben</h2>
 <table>
   <tr><th>Variable</th><th>Bedeutung</th><th>Beispiel</th></tr>
   <tr><td><code>vialType</code></td><td>Vial-Name exakt wie in der Excel-Liste (Leerzeichen und Klammern gehören dazu)</td><td><code>'5ml(Schott)'</code></td></tr>
@@ -74,7 +67,7 @@
   <tr><td><code>h_freezing</code></td><td>Wärmedurchgangskoeffizient (k-Wert) in W/(m²·K)</td><td><code>80</code></td></tr>
   <tr><td><code>n_vials</code></td><td>Anzahl Vials für die Hochrechnung auf die Charge</td><td><code>90000</code></td></tr>
   <tr><td><code>k_factors</code></td><td>Faktoren auf den k-Wert für die Kurvenscharen</td><td><code>[0.80, …, 1.20]</code></td></tr>
-  <tr><td><code>temp_setpt</code>, <code>temp_time_setpt_min</code></td><td>Stellflächenprofil – siehe Abschnitt 4</td><td></td></tr>
+  <tr><td><code>temp_setpt</code>, <code>temp_time_setpt_min</code></td><td>Stellflächenprofil – siehe Abschnitt 3</td><td></td></tr>
 </table>
 <p class="small"><b>Verfügbare Vials:</b> 2R_4R, 6R_8R, 10R_15R, 20R_25R_30R, 50R, 6R (Schott), 5800W, 5816W, 5303, Tray_SS, 100H, 5ml(Schott)</p>
 
@@ -82,7 +75,7 @@
   <b>Tn und Tf prüfen.</b> Die voreingestellten Werte (<code>Tf = -1.54</code>, <code>Tn = -5.84</code>) stammen aus der LyoPRONTO-Dokumentation und gelten für <b>Mannitol</b>. Für Saccharose oder ein anderes Produkt müssen beide Werte recherchiert und von Hand eingetragen werden – das Umstellen von <code>ProductParameter</code> allein ändert Tn und Tf <b>nicht</b>.
 </div>
 
-<h2 class="page-break">4&nbsp;&nbsp;Temperaturprofil eingeben</h2>
+<h2 class="page-break">3&nbsp;&nbsp;Temperaturprofil eingeben</h2>
 <p>Das Profil der Stellfläche wird über Eckpunkte beschrieben: eine Liste mit Temperaturen und eine Liste mit Dauern.</p>
 <pre>temp_setpt          = [20, -44, -44]   # [°C]  Stellflächentemperatur an den Eckpunkten
 temp_time_setpt_min = [128, 110]       # [min] Dauer von einem Eckpunkt zum nächsten</pre>
@@ -143,7 +136,7 @@ temp_time_setpt_min = [128, 60, 30, 60]</pre>
   </div>
 </div>
 
-<h2>5&nbsp;&nbsp;Hinweise und Grenzen</h2>
+<h2>4&nbsp;&nbsp;Hinweise und Grenzen</h2>
 <ul>
   <li><b>Rezept lang genug wählen.</b> Ist das Produkt am Ende des Profils noch nicht durchgefroren, erscheint im Notebook eine deutliche <b>WARNUNG</b>, und die Ergebnisse sind unvollständig. Das passiert, wenn die letzte Haltezeit zu kurz ist – vor allem bei der LyoPRONTO-Rechnung, die die Kristallisation länger ansetzt. Abhilfe: die Haltezeit am Ende verlängern.</li>
   <li><b>Rezept kürzen ist erlaubt.</b> Ist das Produkt längst durchgefroren, kann die letzte Haltezeit gekürzt werden. Die Ergebnisse ändern sich nicht, die Diagramme werden übersichtlicher.</li>
