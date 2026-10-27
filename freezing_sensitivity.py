@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 import freezing as ref
 
@@ -34,35 +33,4 @@ def run_k_sweep(vial, product, h_base, temp_setpt, temp_time_setpt, dt,
         results.append(res)
 
     return results
-##
-
-##
-def summary_table(results, n_vials=1):
-    # Kennwerte je k-Variation; Energie in J bzw. kWh, Leistung in W bzw. kW (bei n_vials > 1)
-    rows = []
-    for r in results:
-        row = {
-            'Δk [%]': round((r['factor'] - 1.0)*100),
-            'h [W/m²K]': r['h'],
-            'tn [h]': r['tn'],
-            'ts LyoPRONTO [h]': r['ts'],
-            'ts* korrigiert [h]': r['ts_star'],
-            'Δt LyoPRONTO [h]': r['ts'] - r['tn'],
-            'Δt korrigiert [h]': r['ts_star'] - r['tn'],
-            'Q Tf-Hold LyoPRONTO [J]': r['Q_hold'],
-            'Q/Hfreeze LyoPRONTO [-]': r['Q_hold']/r['Q_lat'],
-        }
-        if n_vials == 1:
-            row['P max LyoPRONTO [W]'] = r['q_ref'].max()
-            row['P max korrigiert [W]'] = r['q_new'].max()
-            row['E ges. LyoPRONTO [J]'] = r['E_ref'][-1]
-            row['E ges. korrigiert [J]'] = r['E_new'][-1]
-        else:
-            row['P max LyoPRONTO [kW]'] = r['q_ref'].max()*n_vials/1e3
-            row['P max korrigiert [kW]'] = r['q_new'].max()*n_vials/1e3
-            row['E ges. LyoPRONTO [kWh]'] = r['E_ref'][-1]*n_vials/3.6e6
-            row['E ges. korrigiert [kWh]'] = r['E_new'][-1]*n_vials/3.6e6
-        rows.append(row)
-
-    return pd.DataFrame(rows)
 ##

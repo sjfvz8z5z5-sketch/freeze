@@ -210,38 +210,6 @@ def plot_k_family_energy(results, n_vials=1, save_path=None):
     _family(results, 'E', n_vials, f'Energy demand – variation of k (±20 %), {_scope(n_vials)}',
             f'Cumulative heat removed [{unit}]', 'center right', save_path)
 
-
-def plot_k_summary(results, n_vials=1, save_path=None):
-    # Kennwerte über der k-Variation: Kristallisationsdauer, Spitzenleistung, Gesamtenergie
-    apply_style()
-    p_unit, p_fac, e_unit, e_fac = _units(n_vials)
-    dk = np.array([(r['factor'] - 1.0)*100 for r in results])
-    data = [
-        ('Crystallization time Δt [h]',
-         [r['ts'] - r['tn'] for r in results], [r['ts_star'] - r['tn'] for r in results], '{:.2f} h'),
-        (f'Peak cooling power [{p_unit}]',
-         [r['q_ref'].max()*p_fac for r in results], [r['q_new'].max()*p_fac for r in results], '{:.3g} ' + p_unit),
-        (f'Total energy [{e_unit}]',
-         [r['E_ref'][-1]*e_fac for r in results], [r['E_new'][-1]*e_fac for r in results], '{:.4g} ' + e_unit),
-    ]
-
-    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
-    for ax, (title, y_ref, y_new, fmt) in zip(axes, data):
-        for y, color, ls, label in [(y_ref, C_REF, '--', LABEL_REF), (y_new, C_NEW, '-', LABEL_NEW)]:
-            ax.plot(dk, y, color=color, ls=ls, marker='o', ms=8, mec='white', mew=2, label=label)
-            ax.annotate(fmt.format(y[-1]), xy=(dk[-1], y[-1]), xytext=(8, 0),
-                        textcoords='offset points', va='center', fontsize=11, color=C_INK)
-            ax.annotate(fmt.format(y[0]), xy=(dk[0], y[0]), xytext=(-8, 0), ha='right',
-                        textcoords='offset points', va='center', fontsize=11, color=C_INK)
-        ax.set_title(title, fontsize=14)
-        ax.set_xlabel('Δk relative to base [%]')
-        ax.set_xticks(dk)
-        ax.set_xticklabels([(f'{v:+.0f}' if v else '0') if round(v) % 10 == 0 else '' for v in dk])
-        ax.set_xlim(dk[0] - 14, dk[-1] + 14)
-        ax.set_ylim(bottom=0)
-    axes[0].legend(loc='lower left')
-    fig.suptitle(f'Sensitivity to k – {_scope(n_vials)}', x=0.01, ha='left', fontsize=18, fontweight='bold')
-    _finish(fig, save_path)
 ##
 
 ##############################################################################
