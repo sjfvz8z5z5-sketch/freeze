@@ -1,6 +1,7 @@
 import scipy.optimize as sp
 import numpy as np
 import math
+import os
 import csv
 import pylab as plt
 import time
@@ -172,7 +173,7 @@ def compute_crystallization_energy(out, vial, product, h_freezing):
 from datetime import datetime
 
 def plot_with_energy(out, vial, product, h_freezing, title="Freezing – Energy over Tf-hold",
-                     rho_solution=1000.0, L_f=333_700.0):
+                     rho_solution=1000.0, L_f=333_700.0, save_dir='.'):
     t   = out[:, 0]
     Tsh = out[:, 1]
     Tpr = out[:, 2]
@@ -264,7 +265,7 @@ def plot_with_energy(out, vial, product, h_freezing, title="Freezing – Energy 
     # Save
     current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
     figure_name = 'Freezing_Energy_LyoPronto' + current_time + '.pdf'
-    plt.savefig(figure_name)
+    plt.savefig(os.path.join(save_dir, figure_name))
     plt.show()
     plt.close()
 
@@ -410,7 +411,7 @@ def build_energy_consistent(out_ref, vial, product, h_freezing, tn, ts_star):
     return np.asarray(out_new, float)
 
 
-def plot_ref_vs_energy(out_ref, out_new, product, tn, ts_star, Q_J):
+def plot_ref_vs_energy(out_ref, out_new, product, tn, ts_star, Q_J, save_dir='.'):
     t_ref, Tsh_ref, Tpr_ref = out_ref[:,0], out_ref[:,1], out_ref[:,2]
     t_new, Tsh_new, Tpr_new = out_new[:,0], out_new[:,1], out_new[:,2]
     Tf = float(product['Tf']); Tn = float(product['Tn'])
@@ -474,7 +475,7 @@ def plot_ref_vs_energy(out_ref, out_new, product, tn, ts_star, Q_J):
 
 
     current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
-    plt.savefig(f"Freezing_Energy_optimized{current_time}.pdf")
+    plt.savefig(os.path.join(save_dir, f"Freezing_Energy_optimized{current_time}.pdf"))
     plt.show(); plt.close()
 
 
