@@ -109,15 +109,6 @@ temp_time_setpt_min = [128, 110]       # [min] Dauer von einem Eckpunkt zum näc
   <defs><marker id="a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b0b0b"/></marker></defs>
 </svg>
 
-<h3>Häufige Fehler</h3>
-<table>
-  <tr><th>Eingabe</th><th></th><th>Warum</th></tr>
-  <tr><td><code>[20, -44,5]</code></td><td class="wrong">falsch</td><td>Das sind drei Werte: 20, −44 und 5. Richtig: <code>[20, -44.5]</code></td></tr>
-  <tr><td><code>[128, 238]</code></td><td class="wrong">falsch</td><td>238 ist der Zeitpunkt des Endes. Gefragt ist die Dauer des zweiten Abschnitts: <code>[128, 110]</code></td></tr>
-  <tr><td><code>[20, -44]</code> mit <code>[128, 110]</code></td><td class="wrong">falsch</td><td>2 Temperaturen brauchen genau 1 Dauer. Fürs Halten die Temperatur wiederholen: <code>[20, -44, -44]</code></td></tr>
-  <tr><td><code>[20, -44, -44]</code> mit <code>[128, 110]</code></td><td class="right">richtig</td><td>Rampe in 128 min auf −44 °C, danach 110 min halten</td></tr>
-</table>
-
 <h3>Beispiele</h3>
 <div class="ex">
   <div>
@@ -140,8 +131,8 @@ temp_time_setpt_min = [128, 60, 30, 60]</pre>
 <ul>
   <li><b>Rezept lang genug wählen.</b> Ist das Produkt am Ende des Profils noch nicht durchgefroren, erscheint im Notebook eine deutliche <b>WARNUNG</b>, und die Ergebnisse sind unvollständig. Das passiert, wenn die letzte Haltezeit zu kurz ist – vor allem bei der LyoPRONTO-Rechnung, die die Kristallisation länger ansetzt. Abhilfe: die Haltezeit am Ende verlängern.</li>
   <li><b>Rezept kürzen ist erlaubt.</b> Ist das Produkt längst durchgefroren, kann die letzte Haltezeit gekürzt werden. Die Ergebnisse ändern sich nicht, die Diagramme werden übersichtlicher.</li>
-  <li><b>Aufwärmen hat hier nichts zu suchen.</b> Das Tool ist nur fürs Einfrieren gedacht: abkühlen und halten. Aufwärmschritte (z.&nbsp;B. Annealing) bildet das Modell nicht ab – weder Schmelzen noch die Kristallisation des Mannitols.</li>
-  <li><b>Kälteanlage nicht enthalten.</b> Leistung und Energie beziehen sich nur auf die Wärme, die den Vials entzogen wird. Stellflächen, Kälteträger, Kammer und der Wirkungsgrad der Kälteanlage sind nicht berücksichtigt.</li>
+  <li><b>Aufwärmen hat hier nichts zu suchen.</b> Das Tool ist nur fürs Einfrieren gedacht: Abkühlen und Halten. Aufwärmschritte (z.&nbsp;B. Annealing) bildet das Modell nicht ab – weder Schmelzen noch die Kristallisation des Mannitols.</li>
+  <li><b>GT nicht enthalten.</b> Leistung und Energie beziehen sich nur auf die Wärme, die den Vials entzogen wird. Stellflächen, Kälteträger, Kammer und der Wirkungsgrad der Kälteanlage sind nicht berücksichtigt.</li>
   <li><b>Modellgrundlage.</b> Das Tool basiert auf dem LyoPRONTO-Modell (ein Produkt-Temperaturwert pro Vial, konstanter k-Wert). Es dient dem Vergleich von Rezepten, nicht der exakten Vorhersage.</li>
 </ul>
 
