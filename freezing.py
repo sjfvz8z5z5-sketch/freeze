@@ -63,7 +63,10 @@ def freeze(vial, product, h_freezing, temp_setpt, temp_time_setpt, dt):
         idxs = np.where(t_tr > t)[0]
 
         if len(idxs) == 0:
-            print("Total time exceeded. Freezing incomplete")
+            print("\n" + "!"*78 + "\n"
+                  f"WARNUNG (h = {h_freezing:g} W/m²K): Rezept zu kurz – das Produkt ist am Ende des\n"
+                  "Temperaturprofils noch nicht durchgefroren. Die Ergebnisse sind unvollständig.\n"
+                  "Abhilfe: am Ende des Profils eine längere Haltezeit eingeben.\n" + "!"*78)
             break
         i = int(idxs[0])  # 1..Nseg
 
@@ -93,7 +96,10 @@ def freeze(vial, product, h_freezing, temp_setpt, temp_time_setpt, dt):
     while t < ts:
         idxs = np.where(t_tr > t)[0]
         if len(idxs) == 0:
-            print("Total time exceeded. Freezing incomplete")
+            print("\n" + "!"*78 + "\n"
+                  f"WARNUNG (h = {h_freezing:g} W/m²K): Rezept zu kurz – das Produkt ist am Ende des\n"
+                  "Temperaturprofils noch nicht durchgefroren. Die Ergebnisse sind unvollständig.\n"
+                  "Abhilfe: am Ende des Profils eine längere Haltezeit eingeben.\n" + "!"*78)
             break
         i = int(idxs[0])
         if i != i_prev:

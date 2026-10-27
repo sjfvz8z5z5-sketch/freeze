@@ -9,6 +9,9 @@ def run_case(vial, product, h_freezing, temp_setpt, temp_time_setpt, dt):
     Q_hold, tn, ts = ref.compute_crystallization_energy(out_ref, vial, product, h_freezing)
     tn, ts_star, Q_at_ts, Q_lat, reached = ref.backsolve_ts_star(out_ref, vial, product, h_freezing)
     out_new = ref.build_energy_consistent(out_ref, vial, product, h_freezing, tn, ts_star)
+    if not reached:
+        print(f"WARNUNG (h = {h_freezing:g} W/m²K): Auch in der korrigierten Rechnung ist das Produkt "
+              "am Ende nicht durchgefroren. Haltezeit am Ende verlängern.")
 
     # Vorzeichen: abgeführte Wärme positiv
     t_ref, q_ref, E_ref = ref.compute_power_and_energy(out_ref, vial, product, h_freezing)

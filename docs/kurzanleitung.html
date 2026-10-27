@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Kurzanleitung Freezing Tool</title>
+<style>
+  @page { size: A4; margin: 13mm 15mm 13mm 15mm; }
+  :root { --ink:#0b0b0b; --ink2:#52514e; --muted:#898781; --line:#e1e0d9; --blue:#2a78d6; --orange:#eb6834; --warn:#fdf3e1; --warnline:#eda100; --box:#f4f3ef; }
+  * { box-sizing: border-box; }
+  body { font-family: "DejaVu Sans", system-ui, sans-serif; color: var(--ink); font-size: 9.2pt; line-height: 1.38; margin: 0; background: #fff; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--blue); padding-bottom: 4mm; margin-bottom: 3mm; }
+  header h1 { font-size: 19pt; margin: 0 0 1.5mm 0; }
+  header p { margin: 0; color: var(--ink2); }
+  #logo { height: 14mm; max-width: 55mm; object-fit: contain; }
+  h2 { font-size: 12pt; margin: 4.5mm 0 1.5mm 0; color: var(--blue); break-after: avoid; }
+  h3 { font-size: 10.5pt; margin: 4mm 0 1.5mm 0; break-after: avoid; }
+  p { margin: 0 0 2mm 0; }
+  ol, ul { margin: 0 0 2mm 0; padding-left: 5mm; }
+  li { margin-bottom: 1mm; }
+  code, pre { font-family: "DejaVu Sans Mono", monospace; font-size: 8.8pt; }
+  code { background: var(--box); padding: 0 1mm; border-radius: 1mm; }
+  pre { background: var(--box); padding: 2.5mm 3mm; border-radius: 1.5mm; margin: 1.5mm 0 2.5mm 0; white-space: pre-wrap; break-inside: avoid; }
+  table { width: 100%; border-collapse: collapse; margin: 1mm 0 3mm 0; break-inside: avoid; }
+  th, td { text-align: left; vertical-align: top; padding: 1mm 2mm; border-bottom: 1px solid var(--line); }
+  th { font-size: 8.8pt; color: var(--ink2); font-weight: bold; }
+  td:first-child { white-space: nowrap; }
+  .rule { border-left: 3px solid var(--blue); background: #eef4fc; padding: 2.5mm 3.5mm; border-radius: 0 1.5mm 1.5mm 0; margin: 2mm 0 3mm 0; break-inside: avoid; }
+  .rule ol { margin: 0; }
+  .warn { border-left: 3px solid var(--warnline); background: var(--warn); padding: 2.5mm 3.5mm; border-radius: 0 1.5mm 1.5mm 0; margin: 2mm 0 3mm 0; break-inside: avoid; }
+  .ex { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; break-inside: avoid; }
+  .ex > div { border: 1px solid var(--line); border-radius: 1.5mm; padding: 2.5mm 3mm; }
+  .ex h3 { margin-top: 0; }
+  .ex pre { font-size: 7.8pt; white-space: pre; }
+  .small { font-size: 8.6pt; color: var(--ink2); }
+  .wrong { color: #b8322f; font-weight: bold; }
+  .right { color: #006300; font-weight: bold; }
+  svg text { font-family: "DejaVu Sans", sans-serif; }
+  .page-break { break-before: page; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Freezing Tool – Kurzanleitung</h1>
+    <p>Bedienung des Notebooks <code>V0.2_LyoPronto_FC.ipynb</code> (Einfrieren nach dem LyoPRONTO-Modell)</p>
+  </div>
+  <img id="logo" alt="">
+</header>
+
+<h2>1&nbsp;&nbsp;Wozu das Tool dient</h2>
+<p>Das Tool schätzt für ein vorgegebenes Stellflächenprofil den Temperaturverlauf im Produkt, die Kristallisationsdauer sowie die abzuführende Leistung und Energie – pro Vial und hochgerechnet auf die Charge. Es rechnet zwei Varianten:</p>
+<ul>
+  <li><b>LyoPRONTO</b> – das Originalmodell. Die Kristallisationsdauer wird mit der Stellflächentemperatur bei der Keimbildung berechnet.</li>
+  <li><b>Korrigiert</b> – die Kristallisation endet, sobald über die tatsächliche Stellflächentemperatur die Schmelzwärme abgeführt ist. Unterschiede zeigen sich vor allem, wenn die Stellfläche während der Kristallisation noch weiter abkühlt.</li>
+</ul>
+<p>Zusätzlich wird der Wärmedurchgangskoeffizient (k-Wert) variiert, standardmäßig ±20&nbsp;% in 5-%-Schritten.</p>
+
+<h2>2&nbsp;&nbsp;Bedienung in drei Schritten</h2>
+<ol>
+  <li>Notebook im Repo-Ordner öffnen. Im selben Ordner müssen liegen: <code>LyoPronto_VIAL.xlsx</code>, <code>constants_freezing.py</code> und die übrigen <code>.py</code>-Dateien.</li>
+  <li>Im Abschnitt <b>Input</b> die Werte eintragen (Abschnitte 3 und 4).</li>
+  <li>Alle Zellen ausführen (<i>Run All</i>). Jeder Lauf legt einen neuen Ordner an, z.&nbsp;B. <code>LP_V0.2_Mannitol_5%_5ml(Schott)_2ml_261027_141530</code>, mit allen Diagrammen als PDF.</li>
+</ol>
+
+<h2>3&nbsp;&nbsp;Eingaben</h2>
+<table>
+  <tr><th>Variable</th><th>Bedeutung</th><th>Beispiel</th></tr>
+  <tr><td><code>vialType</code></td><td>Vial-Name exakt wie in der Excel-Liste (Leerzeichen und Klammern gehören dazu)</td><td><code>'5ml(Schott)'</code></td></tr>
+  <tr><td><code>fill_volume</code></td><td>Füllmenge je Vial in ml</td><td><code>2</code></td></tr>
+  <tr><td><code>ProductParameter</code></td><td>1 = Mannitol 5&nbsp;%, 2 = Saccharose 5&nbsp;%</td><td><code>1</code></td></tr>
+  <tr><td><code>Tpr0</code></td><td>Produkttemperatur beim Start in °C (unabhängig von der Stellfläche)</td><td><code>20</code></td></tr>
+  <tr><td><code>Tf</code>, <code>Tn</code></td><td>Gefriertemperatur und Keimbildungstemperatur in °C – siehe Hinweis unten</td><td><code>-1.54</code>, <code>-5.84</code></td></tr>
+  <tr><td><code>h_freezing</code></td><td>Wärmedurchgangskoeffizient (k-Wert) in W/(m²·K)</td><td><code>80</code></td></tr>
+  <tr><td><code>n_vials</code></td><td>Anzahl Vials für die Hochrechnung auf die Charge</td><td><code>90000</code></td></tr>
+  <tr><td><code>k_factors</code></td><td>Faktoren auf den k-Wert für die Kurvenscharen</td><td><code>[0.80, …, 1.20]</code></td></tr>
+  <tr><td><code>temp_setpt</code>, <code>temp_time_setpt_min</code></td><td>Stellflächenprofil – siehe Abschnitt 4</td><td></td></tr>
+</table>
+<p class="small"><b>Verfügbare Vials:</b> 2R_4R, 6R_8R, 10R_15R, 20R_25R_30R, 50R, 6R (Schott), 5800W, 5816W, 5303, Tray_SS, 100H, 5ml(Schott)</p>
+
+<div class="warn">
+  <b>Tn und Tf prüfen.</b> Die voreingestellten Werte (<code>Tf = -1.54</code>, <code>Tn = -5.84</code>) stammen aus der LyoPRONTO-Dokumentation und gelten für <b>Mannitol</b>. Für Saccharose oder ein anderes Produkt müssen beide Werte recherchiert und von Hand eingetragen werden – das Umstellen von <code>ProductParameter</code> allein ändert Tn und Tf <b>nicht</b>.
+</div>
+
+<h2 class="page-break">4&nbsp;&nbsp;Temperaturprofil eingeben</h2>
+<p>Das Profil der Stellfläche wird über Eckpunkte beschrieben: eine Liste mit Temperaturen und eine Liste mit Dauern.</p>
+<pre>temp_setpt          = [20, -44, -44]   # [°C]  Stellflächentemperatur an den Eckpunkten
+temp_time_setpt_min = [128, 110]       # [min] Dauer von einem Eckpunkt zum nächsten</pre>
+
+<div class="rule">
+<ol>
+  <li><b>Die Temperaturliste hat immer genau ein Element mehr als die Zeitliste.</b> 3 Temperaturen → 2 Dauern.</li>
+  <li><b>Die erste Temperatur ist die Stellflächentemperatur beim Start</b>, nicht die Produkttemperatur (dafür gibt es <code>Tpr0</code>).</li>
+  <li><b>Jede Zeit ist eine Dauer in Minuten</b>: wie lange es von einem Eckpunkt zum nächsten dauert – <b>kein Zeitpunkt</b>. Jede Dauer muss größer als 0 sein.</li>
+  <li><b>Halten = dieselbe Temperatur zweimal hintereinander</b>, dazwischen die Haltedauer.</li>
+  <li><b>Werte werden durch Komma getrennt, Dezimalzahlen mit Punkt</b> geschrieben.</li>
+</ol>
+</div>
+
+<svg viewBox="0 0 640 175" width="100%" role="img" aria-label="Profil zum Beispiel: 20 °C, Rampe 128 min auf -44 °C, 110 min halten">
+  <line x1="60" y1="20" x2="60" y2="140" stroke="#c3c2b7"/>
+  <line x1="60" y1="140" x2="620" y2="140" stroke="#c3c2b7"/>
+  <text x="52" y="34" text-anchor="end" font-size="11" fill="#52514e">20 °C</text>
+  <text x="52" y="128" text-anchor="end" font-size="11" fill="#52514e">−44 °C</text>
+  <polyline points="70,30 380,124 610,124" fill="none" stroke="#2a78d6" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="70" cy="30" r="5" fill="#2a78d6" stroke="#fff" stroke-width="2"/>
+  <circle cx="380" cy="124" r="5" fill="#2a78d6" stroke="#fff" stroke-width="2"/>
+  <circle cx="610" cy="124" r="5" fill="#2a78d6" stroke="#fff" stroke-width="2"/>
+  <text x="82" y="26" font-size="11">Punkt 1: 20</text>
+  <text x="380" y="112" font-size="11" text-anchor="middle">Punkt 2: −44</text>
+  <text x="610" y="112" font-size="11" text-anchor="end">Punkt 3: −44</text>
+  <line x1="72" y1="155" x2="378" y2="155" stroke="#0b0b0b" marker-start="url(#a)" marker-end="url(#a)"/>
+  <line x1="382" y1="155" x2="608" y2="155" stroke="#0b0b0b" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text x="225" y="170" font-size="11" text-anchor="middle">Dauer 1: 128 min (Rampe)</text>
+  <text x="495" y="170" font-size="11" text-anchor="middle">Dauer 2: 110 min (Halten)</text>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b0b0b"/></marker></defs>
+</svg>
+
+<h3>Häufige Fehler</h3>
+<table>
+  <tr><th>Eingabe</th><th></th><th>Warum</th></tr>
+  <tr><td><code>[20, -44,5]</code></td><td class="wrong">falsch</td><td>Das sind drei Werte: 20, −44 und 5. Richtig: <code>[20, -44.5]</code></td></tr>
+  <tr><td><code>[128, 238]</code></td><td class="wrong">falsch</td><td>238 ist der Zeitpunkt des Endes. Gefragt ist die Dauer des zweiten Abschnitts: <code>[128, 110]</code></td></tr>
+  <tr><td><code>[20, -44]</code> mit <code>[128, 110]</code></td><td class="wrong">falsch</td><td>2 Temperaturen brauchen genau 1 Dauer. Fürs Halten die Temperatur wiederholen: <code>[20, -44, -44]</code></td></tr>
+  <tr><td><code>[20, -44, -44]</code> mit <code>[128, 110]</code></td><td class="right">richtig</td><td>Rampe in 128 min auf −44 °C, danach 110 min halten</td></tr>
+</table>
+
+<h3>Beispiele</h3>
+<div class="ex">
+  <div>
+    <h3>Vorgekühlte Stellfläche</h3>
+    <p class="small">Stellfläche hat schon −15 °C, das Produkt kommt mit Raumtemperatur: 60 min halten, in 30 min auf −44 °C, 60 min halten.</p>
+<pre>Tpr0                = 20
+temp_setpt          = [-15,-15,-44,-44]
+temp_time_setpt_min = [60, 30, 60]</pre>
+  </div>
+  <div>
+    <h3>Nach dem Einfrieren weiter abkühlen</h3>
+    <p class="small">Rampe auf −44 °C, 60 min halten, in 30 min auf −55 °C, 60 min halten.</p>
+<pre>Tpr0                = 20
+temp_setpt          = [20,-44,-44,-55,-55]
+temp_time_setpt_min = [128, 60, 30, 60]</pre>
+  </div>
+</div>
+
+<h2>5&nbsp;&nbsp;Hinweise und Grenzen</h2>
+<ul>
+  <li><b>Rezept lang genug wählen.</b> Ist das Produkt am Ende des Profils noch nicht durchgefroren, erscheint im Notebook eine deutliche <b>WARNUNG</b>, und die Ergebnisse sind unvollständig. Das passiert, wenn die letzte Haltezeit zu kurz ist – vor allem bei der LyoPRONTO-Rechnung, die die Kristallisation länger ansetzt. Abhilfe: die Haltezeit am Ende verlängern.</li>
+  <li><b>Rezept kürzen ist erlaubt.</b> Ist das Produkt längst durchgefroren, kann die letzte Haltezeit gekürzt werden. Die Ergebnisse ändern sich nicht, die Diagramme werden übersichtlicher.</li>
+  <li><b>Aufwärmen hat hier nichts zu suchen.</b> Das Tool ist nur fürs Einfrieren gedacht: abkühlen und halten. Aufwärmschritte (z.&nbsp;B. Annealing) bildet das Modell nicht ab – weder Schmelzen noch die Kristallisation des Mannitols.</li>
+  <li><b>Kälteanlage nicht enthalten.</b> Leistung und Energie beziehen sich nur auf die Wärme, die den Vials entzogen wird. Stellflächen, Kälteträger, Kammer und der Wirkungsgrad der Kälteanlage sind nicht berücksichtigt.</li>
+  <li><b>Modellgrundlage.</b> Das Tool basiert auf dem LyoPRONTO-Modell (ein Produkt-Temperaturwert pro Vial, konstanter k-Wert). Es dient dem Vergleich von Rezepten, nicht der exakten Vorhersage.</li>
+</ul>
+
+</body>
+</html>
